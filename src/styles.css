@@ -1,0 +1,12 @@
+body {
+    background: linear-gradient(180deg, #f7fbff 0%, #eef4f8 100%);
+}
+
+.hero-banner {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b3d91 100%);
+    box-shadow: 0 16px 40px rgba(13, 110, 253, 0.2);
+}
+
+.block-card {
+    border-left: 4px solid #0d6efd;
+}
