@@ -1,14 +1,19 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import Hero from '../components/Hero'
-import Dashboard from '../components/Dashboard'
-import InstitutionCard from '../components/InstitutionCard'
+import React, { useState } from 'react'
+import Sidebar from '../components/Sidebar'
+import Header from '../components/Header'
+import HeroSection from '../components/HeroSection'
+import StatisticsCards from '../components/StatisticsCards'
+import ImpactSection from '../components/ImpactSection'
+import RecentDonations from '../components/RecentDonations'
+import FeaturedInstitutions from '../components/FeaturedInstitutions'
 import DonationForm from '../components/DonationForm'
-import BlockchainStack from '../components/BlockchainStack'
+import Donations from './Donations'
+import About from './About'
 import institutions from '../data/institutions'
 import { useBlockchain } from '../hooks/useBlockchain'
 
 export default function Home() {
+  const [currentPage, setCurrentPage] = useState('home')
   const {
     blocks,
     pushBlock,
@@ -16,35 +21,52 @@ export default function Home() {
     totals
   } = useBlockchain()
 
-  return (
-    <div>
-      <Navbar />
-      <main className="container py-5">
-        <Hero />
-
-        <section className="my-4">
-          <Dashboard totals={totals} institutionsCount={institutions.length} />
-        </section>
-
-        <section className="row gy-4">
-          <div className="col-lg-6">
-            <h4 className="mb-3">Instituições</h4>
-            {institutions.map(inst => (
-              <InstitutionCard key={inst.id} inst={inst} onDonate={(valor) => pushBlock(inst, valor)} />
-            ))}
-          </div>
-
-          <div className="col-lg-6">
-            <h4 className="mb-3">Fazer Doação</h4>
-            <DonationForm institutions={institutions} onDonate={(inst, valor) => pushBlock(inst, valor)} />
-
-            <div className="mt-4">
-              <h5>Blockchain Simulada</h5>
-              <BlockchainStack blocks={blocks} onRevert={popBlock} />
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return (
+          <>
+            <HeroSection />
+            
+            <div className="donation-highlight">
+              <DonationForm institutions={institutions} onDonate={(inst, valor) => pushBlock(inst, valor)} />
             </div>
-          </div>
-        </section>
-      </main>
+            
+            <StatisticsCards 
+              institutionsCount={institutions.length}
+              totalDonations={totals.totalDonations}
+              totalValue={totals.totalValue}
+            />
+
+            <div className="content-grid">
+              <FeaturedInstitutions />
+              <div className="sidebar-section">
+                <ImpactSection 
+                  institutionsCount={institutions.length}
+                  totalDonations={totals.totalDonations}
+                  totalValue={totals.totalValue}
+                />
+                <RecentDonations />
+              </div>
+            </div>
+          </>
+        )
+      case 'donations':
+        return <Donations />
+      case 'about':
+        return <About />
+      default:
+        return null
+    }
+  }
+
+  return (
+    <div className="dashboard-layout">
+      <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <div className="main-content">
+        <Header />
+        {renderPage()}
+      </div>
     </div>
   )
 }
